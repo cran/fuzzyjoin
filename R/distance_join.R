@@ -35,19 +35,25 @@ distance_join <- function(x, y, by = NULL, max_dist = 1,
   method <- match.arg(method)
 
   match_fun <- function(v1, v2) {
+    if (is.null(dim(v1))) {
+      # If the vectors are one-dimensional, turn them into 1-column matrices
+      v1 <- t(t(v1))
+      v2 <- t(t(v2))
+    }
+
     if (method == "euclidean") {
       d <- sqrt(rowSums((v1 - v2) ^ 2))
     } else if (method == "manhattan") {
       d <- rowSums(abs(v1 - v2))
     }
-    ret <- dplyr::data_frame(instance = d <= max_dist)
+    ret <- tibble::tibble(instance = d <= max_dist)
     if (!is.null(distance_col)) {
       ret[[distance_col]] <- d
     }
     ret
   }
 
-  fuzzy_join(x, y, multi_by = by, multi_match_fun = match_fun, mode = mode)
+  ensure_distance_col(fuzzy_join(x, y, multi_by = by, multi_match_fun = match_fun, mode = mode), distance_col, mode)
 }
 
 

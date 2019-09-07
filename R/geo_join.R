@@ -112,14 +112,14 @@ geo_join <- function(x, y, by = NULL, max_dist,
       d <- d / 1000
     }
 
-    ret <- dplyr::data_frame(include = d <= max_dist)
+    ret <- tibble::tibble(include = d <= max_dist)
     if (!is.null(distance_col)) {
       ret[[distance_col]] <- d
     }
     ret
   }
 
-  fuzzy_join(x, y, multi_by = by, multi_match_fun = match_fun, mode = mode)
+  ensure_distance_col(fuzzy_join(x, y, multi_by = by, multi_match_fun = match_fun, mode = mode), distance_col, mode)
 }
 
 

@@ -11,7 +11,7 @@
 #' @param max_dist Maximum distance to use for joining
 #' @param ignore_case Whether to be case insensitive (default yes)
 #' @param method Method for computing string distance, see
-#' \code{stringdist-methods} in the stringdist package.
+#' \code{stringdist-metrics} in the stringdist package.
 #' @param distance_col If given, will add a column with this
 #' name containing the difference between the two
 #' @param mode One of "inner", "left", "right", "full" "semi", or "anti"
@@ -76,14 +76,14 @@ stringdist_join <- function(x, y, by = NULL, max_dist = 2,
       # have to compute them all
       dists <- stringdist::stringdist(v1, v2, method = method, ...)
     }
-    ret <- dplyr::data_frame(include = (dists <= max_dist))
+    ret <- tibble::tibble(include = (dists <= max_dist))
     if (!is.null(distance_col)) {
       ret[[distance_col]] <- dists
     }
     ret
   }
 
-  fuzzy_join(x, y, by = by, mode = mode, match_fun = match_fun)
+  ensure_distance_col(fuzzy_join(x, y, by = by, mode = mode, match_fun = match_fun), distance_col, mode)
 }
 
 

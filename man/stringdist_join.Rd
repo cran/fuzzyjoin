@@ -10,9 +10,10 @@
 \alias{stringdist_anti_join}
 \title{Join two tables based on fuzzy string matching of their columns}
 \usage{
-stringdist_join(x, y, by = NULL, max_dist = 2, method = c("osa", "lv",
-  "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw", "soundex"),
-  mode = "inner", ignore_case = FALSE, distance_col = NULL, ...)
+stringdist_join(x, y, by = NULL, max_dist = 2, method = c("osa",
+  "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw",
+  "soundex"), mode = "inner", ignore_case = FALSE,
+  distance_col = NULL, ...)
 
 stringdist_inner_join(x, y, by = NULL, distance_col = NULL, ...)
 
@@ -36,7 +37,7 @@ stringdist_anti_join(x, y, by = NULL, distance_col = NULL, ...)
 \item{max_dist}{Maximum distance to use for joining}
 
 \item{method}{Method for computing string distance, see
-\code{stringdist-methods} in the stringdist package.}
+\code{stringdist-metrics} in the stringdist package.}
 
 \item{mode}{One of "inner", "left", "right", "full" "semi", or "anti"}
 
