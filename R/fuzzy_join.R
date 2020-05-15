@@ -46,7 +46,7 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
   x_groups <- dplyr::groups(x)
   x <- dplyr::ungroup(x)
   regroup <- function(d) {
-    if (is.null(x_groups)) {
+    if (length(x_groups) == 0) {
       return(d)
     }
 
@@ -285,15 +285,22 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
   }
 
   ret <- dplyr::bind_cols(
-    x[matches$x, , drop = FALSE],
-    y[matches$y, , drop = FALSE]
+    unrowwname(x[matches$x, , drop = FALSE]),
+    unrowwname(y[matches$y, , drop = FALSE])
   )
   if (ncol(matches) > 2) {
-    extra_cols <- matches[, -(1:2), drop = FALSE]
+    extra_cols <- unrowwname(matches[, -(1:2), drop = FALSE])
     ret <- dplyr::bind_cols(ret, extra_cols)
   }
 
-  regroup(ret)
+  ret <- regroup(ret)
+
+  # Base the type (data.frame vs tbl_df) on x, not on y
+  if (!inherits(x, "tbl_df")) {
+    ret <- as.data.frame(ret)
+  }
+
+  ret
 }
 
 

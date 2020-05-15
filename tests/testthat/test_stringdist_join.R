@@ -173,7 +173,7 @@ test_that("stringdist_join works with data frames without matches", {
   expect_true(all(is.na(j3$cut)))
 
   j4 <- stringdist_full_join(diamonds, d, by = c(cut = "cut2"))
-  expect_equal(nrow(j4), nrow(diamonds), nrow(d))
+  expect_equal(nrow(j4), nrow(diamonds) + nrow(d))
   expect_true(all(is.na(j4$cut) | is.na(j4$cut2)))
   expect_true(all(is.na(j4$carat) | is.na(j4$type)))
 
@@ -236,6 +236,22 @@ test_that("stringdist_join renames similar columns", {
   expect_true(all(j$price.y %in% d$price))
 })
 
+test_that(paste("stringdist_join returns a data.frame when x",
+                "is a data.frame, whether y is or not"), {
+  result <- diamonds %>%
+    as.data.frame() %>%
+    stringdist_inner_join(d, by = c(cut = "cut2"))
+
+  expect_is(result, "data.frame")
+  expect_false(inherits(result, "tbl_df"))
+
+  result <- diamonds %>%
+    as.data.frame() %>%
+    stringdist_inner_join(as.data.frame(d), by = c(cut = "cut2"))
+
+  expect_is(result, "data.frame")
+  expect_false(inherits(result, "tbl_df"))
+})
 
 test_that("stringdist_join works on grouped data frames", {
   d <- tibble(cut2 = c(
@@ -262,6 +278,7 @@ test_that("stringdist_join works on grouped data frames", {
     expect_equal(j1, ungroup(j2))
 
     j3 <- stringdist_join(diamonds_grouped, d2, by = "cut", mode = mode)
+    expect_is(j3, "tbl_df")
     expect_equal(length(groups(j3)), 1)
     expect_equal(nrow(j1), nrow(j3))
     if (mode %in% c("semi", "anti")) {
