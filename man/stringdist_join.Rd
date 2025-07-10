@@ -54,7 +54,7 @@ stringdist_anti_join(x, y, by = NULL, distance_col = NULL, ...)
 \item{distance_col}{If given, will add a column with this
 name containing the difference between the two}
 
-\item{...}{Arguments passed on to \code{\link{stringdist}}}
+\item{...}{Arguments passed on to \code{\link[stringdist]{stringdist}}}
 }
 \description{
 Join two tables based on fuzzy string matching of their columns.

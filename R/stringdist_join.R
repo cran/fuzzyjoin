@@ -15,7 +15,7 @@
 #' @param distance_col If given, will add a column with this
 #' name containing the difference between the two
 #' @param mode One of "inner", "left", "right", "full" "semi", or "anti"
-#' @param ... Arguments passed on to \code{\link{stringdist}}
+#' @param ... Arguments passed on to \code{\link[stringdist]{stringdist}}
 #'
 #' @details If \code{method = "soundex"}, the \code{max_dist} is
 #' automatically set to 0.5, since soundex returns either a 0 (match)
