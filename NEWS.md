@@ -1,3 +1,11 @@
+# fuzzyjoin 0.1.8
+
+* Updated README links to remove stale redirects and a dead external URL that triggered CRAN URL check notes.
+
+# fuzzyjoin 0.1.7
+
+* fixing documentation to keep it on CRAN.
+
 # fuzzyjoin 0.1.6
 
 * Updates to internals to make compatible with dplyr 1.0.0 (#67, @hadley)

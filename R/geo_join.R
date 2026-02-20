@@ -1,32 +1,31 @@
 #' Join two tables based on a geo distance of longitudes and latitudes
 #'
-#' This allows joining based on combinations of longitudes and latitudes. If
-#' you are using a distance metric that is *not* based on latitude and
-#' longitude, use \code{\link{distance_join}} instead. Distances are
-#' calculated based on the \code{distHaversine}, \code{distGeo},
-#' \code{distCosine}, etc methods in the geosphere package.
+#' This allows joining based on combinations of longitudes and latitudes. If you
+#' are using a distance metric that is *not* based on latitude and longitude,
+#' use \code{\link{distance_join}} instead. Distances are calculated based on
+#' the \code{distHaversine}, \code{distGeo}, \code{distCosine}, etc methods in
+#' the geosphere package.
 #'
 #' @param x A tbl
 #' @param y A tbl
 #' @param by Columns by which to join the two tables
 #' @param max_dist Maximum distance to use for joining
-#' @param method Method to use for computing distance: one of
-#' "haversine" (default), "geo", "cosine", "meeus", "vincentysphere",
-#' "vincentyellipsoid"
+#' @param method Method to use for computing distance: one of "haversine"
+#'   (default), "geo", "cosine", "meeus", "vincentysphere", "vincentyellipsoid"
 #' @param unit Unit of distance for threshold (default "miles")
 #' @param mode One of "inner", "left", "right", "full" "semi", or "anti"
-#' @param distance_col If given, will add a column with this
-#' name containing the geographical distance between the two
+#' @param distance_col If given, will add a column with this name containing the
+#'   geographical distance between the two
 #' @param ... Extra arguments passed on to the distance method
 #'
 #' @details "Haversine" was chosen as default since in some tests it is
-#' approximately the fastest method. Note that by far the slowest method is
-#' vincentyellipsoid, and on fuzzy joins should only be used when there are
-#' very few pairs and accuracy is imperative.
+#'   approximately the fastest method. Note that by far the slowest method is
+#'   vincentyellipsoid, and on fuzzy joins should only be used when there are
+#'   very few pairs and accuracy is imperative.
 #'
-#' If you need to use a custom geo method, you may want to write it directly
-#' with the \code{multi_by} and \code{multi_match_fun} arguments to
-#' \code{fuzzy_join}.
+#'   If you need to use a custom geo method, you may want to write it directly
+#'   with the \code{multi_by} and \code{multi_match_fun} arguments to
+#'   \code{fuzzy_join}.
 #'
 #' @importFrom utils data
 #'
@@ -37,30 +36,31 @@
 #'
 #' # find pairs of US states whose centers are within
 #' # 200 miles of each other
-#' states <- data_frame(state = state.name,
-#'                      longitude = state.center$x,
-#'                      latitude = state.center$y)
+#' states <- tibble::tibble(state = state.name,
+#'                  longitude = state.center$x,
+#'                  latitude = state.center$y)
 #'
 #' s1 <- rename(states, state1 = state)
 #' s2 <- rename(states, state2 = state)
 #'
 #' pairs <- s1 %>%
-#'  geo_inner_join(s2, max_dist = 200) %>%
-#'  filter(state1 != state2)
+#'   geo_inner_join(s2, max_dist = 200) %>%
+#'   filter(state1 != state2)
 #'
 #' pairs
 #'
 #' # plot them
-#' library(ggplot2)
-#' ggplot(pairs, aes(x = longitude.x, y = latitude.x,
-#'                   xend = longitude.y, yend = latitude.y)) +
-#'   geom_segment(color = "red") +
-#'   borders("state") +
-#'   theme_void()
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   ggplot2::ggplot(pairs, ggplot2::aes(x = longitude.x, y = latitude.x,
+#'                                       xend = longitude.y, yend = latitude.y)) +
+#'     ggplot2::geom_segment(color = "red") +
+#'     ggplot2::theme_void()
+#' }
 #'
 #' # also get distances
 #' s1 %>%
 #'   geo_inner_join(s2, max_dist = 200, distance_col = "distance")
+#'
 #'
 #' @export
 geo_join <- function(x, y, by = NULL, max_dist,

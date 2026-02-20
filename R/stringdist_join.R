@@ -1,43 +1,42 @@
 #' Join two tables based on fuzzy string matching of their columns
 #'
-#' Join two tables based on fuzzy string matching of their columns.
-#' This is useful, for example, in matching free-form inputs in
-#' a survey or online form, where it can catch misspellings and
-#' small personal changes.
+#' Join two tables based on fuzzy string matching of their columns. This is
+#' useful, for example, in matching free-form inputs in a survey or online form,
+#' where it can catch misspellings and small personal changes.
 #'
-#' @param x A tbl
-#' @param y A tbl
-#' @param by Columns by which to join the two tables
-#' @param max_dist Maximum distance to use for joining
-#' @param ignore_case Whether to be case insensitive (default yes)
-#' @param method Method for computing string distance, see
-#' \code{stringdist-metrics} in the stringdist package.
-#' @param distance_col If given, will add a column with this
-#' name containing the difference between the two
+#' @param x A tbl.
+#' @param y A tbl.
+#' @param by Columns by which to join the two tables.
+#' @param max_dist Maximum distance to use for joining.
+#' @param ignore_case Whether to be case insensitive (default yes).
+#' @param method Method for computing string distance, see.
+#'   \code{stringdist-metrics} in the stringdist package.
+#' @param distance_col If given, will add a column with this name containing the
+#'   difference between the two.
 #' @param mode One of "inner", "left", "right", "full" "semi", or "anti"
-#' @param ... Arguments passed on to \code{\link[stringdist]{stringdist}}
+#' @param ... Arguments passed on to \code{\link[stringdist]{stringdist}}.
 #'
-#' @details If \code{method = "soundex"}, the \code{max_dist} is
-#' automatically set to 0.5, since soundex returns either a 0 (match)
-#' or a 1 (no match).
+#' @details If \code{method = "soundex"}, the \code{max_dist} is automatically
+#'   set to 0.5, since soundex returns either a 0 (match) or a 1 (no match).
 #'
 #' @examples
 #'
 #' library(dplyr)
-#' library(ggplot2)
-#' data(diamonds)
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   diamonds <- tibble::as_tibble(ggplot2::diamonds)
 #'
-#' d <- data_frame(approximate_name = c("Idea", "Premiums", "Premioom",
-#'                                      "VeryGood", "VeryGood", "Faiir"),
-#'                 type = 1:6)
+#'   d <- tibble::tibble(approximate_name = c("Idea", "Premiums", "Premioom",
+#'                                        "VeryGood", "VeryGood", "Faiir"),
+#'                   type = 1:6)
 #'
-#' # no matches when they are inner-joined:
-#' diamonds %>%
-#'   inner_join(d, by = c(cut = "approximate_name"))
+#'   # no matches when they are inner-joined:
+#'   diamonds %>%
+#'     inner_join(d, by = c(cut = "approximate_name"))
 #'
-#' # but we can match when they're fuzzy joined
-#' diamonds %>%
-#'  stringdist_inner_join(d, by = c(cut = "approximate_name"))
+#'   # but we can match when they're fuzzy joined
+#'   diamonds %>%
+#'    stringdist_inner_join(d, by = c(cut = "approximate_name"))
+#' }
 #'
 #' @export
 stringdist_join <- function(x, y, by = NULL, max_dist = 2,
@@ -45,7 +44,8 @@ stringdist_join <- function(x, y, by = NULL, max_dist = 2,
                                        "cosine", "jaccard", "jw", "soundex"),
                             mode = "inner",
                             ignore_case = FALSE,
-                            distance_col = NULL, ...) {
+                            distance_col = NULL,
+                            ...) {
   method <- match.arg(method)
 
   if (method == "soundex") {
@@ -83,7 +83,12 @@ stringdist_join <- function(x, y, by = NULL, max_dist = 2,
     ret
   }
 
-  ensure_distance_col(fuzzy_join(x, y, by = by, mode = mode, match_fun = match_fun), distance_col, mode)
+  ensure_distance_col(fuzzy_join(x, y,
+                                    by = by,
+                                    mode = mode,
+                                    match_fun = match_fun),
+                        distance_col, mode)
+
 }
 
 

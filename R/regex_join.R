@@ -1,8 +1,8 @@
-#' Join two tables based on a regular expression in one column
-#' matching the other
+#' Join two tables based on a regular expression in one column matching the
+#' other
 #'
-#' Join a table with a string column by a regular expression column
-#' in another table
+#' Join a table with a string column by a regular expression column in another
+#' table
 #'
 #' @param x A tbl
 #' @param y A tbl
@@ -15,21 +15,20 @@
 #' @examples
 #'
 #' library(dplyr)
-#' library(ggplot2)
-#' data(diamonds)
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   diamonds <- tibble::as_tibble(ggplot2::diamonds)
 #'
-#' diamonds <- tbl_df(diamonds)
+#'   d <- tibble::tibble(regex_name = c("^Idea", "mium", "Good"),
+#'                   type = 1:3)
 #'
-#' d <- data_frame(regex_name = c("^Idea", "mium", "Good"),
-#'                 type = 1:3)
+#'   # When they are inner_joined, only Good<->Good matches
+#'   diamonds %>%
+#'     inner_join(d, by = c(cut = "regex_name"))
 #'
-#' # When they are inner_joined, only Good<->Good matches
-#' diamonds %>%
-#'   inner_join(d, by = c(cut = "regex_name"))
-#'
-#' # but we can regex match them
-#' diamonds %>%
-#'  regex_inner_join(d, by = c(cut = "regex_name"))
+#'   # but we can regex match them
+#'   diamonds %>%
+#'    regex_inner_join(d, by = c(cut = "regex_name"))
+#' }
 #'
 #' @export
 regex_join <- function(x, y, by = NULL, mode = "inner", ignore_case = FALSE) {

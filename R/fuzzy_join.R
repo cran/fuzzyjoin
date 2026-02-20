@@ -1,47 +1,45 @@
-#' Join two tables based not on exact matches, but with a function
-#' describing whether two vectors are matched or not
+#' Join two tables based not on exact matches, but with a function describing
+#' whether two vectors are matched or not
 #'
-#' The \code{match_fun} argument is called once on a vector with all pairs
-#' of unique comparisons: thus, it should be efficient and vectorized.
+#' The \code{match_fun} argument is called once on a vector with all pairs of
+#' unique comparisons: thus, it should be efficient and vectorized.
 #'
 #' @param x A tbl
 #' @param y A tbl
 #' @param by Columns of each to join
-#' @param match_fun Vectorized function given two columns, returning
-#' TRUE or FALSE as to whether they are a match. Can be a list of functions
-#' one for each pair of columns specified in \code{by} (if a named list, it
-#' uses the names in x).
-#' If only one function is given it is used on all column pairs.
-#' @param multi_by Columns to join, where all columns will be used to
-#' test matches together
-#' @param multi_match_fun Function to use for testing matches, performed
-#' on all columns in each data frame simultaneously
+#' @param match_fun Vectorized function given two columns, returning TRUE or
+#'   FALSE as to whether they are a match. Can be a list of functions one for
+#'   each pair of columns specified in \code{by} (if a named list, it uses the
+#'   names in x). If only one function is given it is used on all column pairs.
+#' @param multi_by Columns to join, where all columns will be used to test
+#'   matches together
+#' @param multi_match_fun Function to use for testing matches, performed on all
+#'   columns in each data frame simultaneously
 #' @param index_match_fun Function to use for matching tables. Unlike
-#' \code{match_fun} and \code{index_match_fun}, this is performed on the
-#' original columns and returns pairs of indices.
+#'   \code{match_fun} and \code{index_match_fun}, this is performed on the
+#'   original columns and returns pairs of indices.
 #' @param mode One of "inner", "left", "right", "full" "semi", or "anti"
 #' @param ... Extra arguments passed to match_fun
 #'
-#' @details match_fun should return either a logical vector, or a data
-#' frame where the first column is logical. If the latter, the
-#' additional columns will be appended to the output. For example,
-#' these additional columns could contain the distance metrics that
-#' one is filtering on.
+#' @details match_fun should return either a logical vector, or a data frame
+#'   where the first column is logical. If the latter, the additional columns
+#'   will be appended to the output. For example, these additional columns could
+#'   contain the distance metrics that one is filtering on.
 #'
-#' Note that as of now, you cannot give both \code{match_fun}
-#' and \code{multi_match_fun}- you can either compare each column
-#' individually or compare all of them.
+#'   Note that as of now, you cannot give both \code{match_fun} and
+#'   \code{multi_match_fun}- you can either compare each column individually or
+#'   compare all of them.
 #'
-#' Like in dplyr's join operations, \code{fuzzy_join} ignores groups,
-#' but preserves the grouping of x in the output.
+#'   Like in dplyr's join operations, \code{fuzzy_join} ignores groups, but
+#'   preserves the grouping of x in the output.
 #'
 #' @importFrom dplyr %>%
 #' @importFrom tibble tibble
 #'
 #' @export
 fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
-                       multi_by = NULL, multi_match_fun = NULL,
-                       index_match_fun = NULL, mode = "inner", ...) {
+                         multi_by = NULL, multi_match_fun = NULL,
+                         index_match_fun = NULL, mode = "inner", ...) {
   # preserve the grouping of x
   x_groups <- dplyr::groups(x)
   x <- dplyr::ungroup(x)
@@ -55,7 +53,7 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
     # add .x to those that are missing; they've been renamed
     g[missing] <- paste0(g[missing], ".x")
 
-    dplyr::group_by_at(d, g)
+    dplyr::group_by(d, dplyr::across(dplyr::all_of(g)))
   }
 
   mode <- match.arg(mode, c("inner", "left", "right", "full", "semi", "anti"))
@@ -173,9 +171,9 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
           dplyr::semi_join(accept, by = c("x", "y")) %>%
           dplyr::mutate(name = by$x[i]) %>%
           dplyr::select(-i) %>%
-          tidyr::gather(key, value, -x, -y, -name) %>%
+          tidyr::pivot_longer(c(-x, -y, -name), names_to = "key", values_to = "value") %>%
           tidyr::unite(newname, name, key, sep = ".") %>%
-          tidyr::spread(newname, value)
+          tidyr::pivot_wider(names_from = newname, values_from = value)
       } else {
         matches <- dplyr::distinct(matches, x, y)
       }
@@ -190,15 +188,15 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
     number_y_rows <- nrow(y)
 
     indices_x <- x %>%
-      dplyr::select_at(by$x) %>%
+      dplyr::select(dplyr::all_of(by$x)) %>%
       dplyr::mutate(indices = seq_len(number_x_rows)) %>%
-      dplyr::group_by_at(dplyr::vars(-dplyr::one_of("indices"))) %>%
+      dplyr::group_by(dplyr::across(-dplyr::all_of("indices"))) %>%
       tidyr::nest() %>%
       dplyr::mutate(indices = purrr::map(data, "indices"))
     indices_y <- y %>%
-      dplyr::select_at(by$y) %>%
+      dplyr::select(dplyr::all_of(by$y)) %>%
       dplyr::mutate(indices = seq_len(number_y_rows)) %>%
-      dplyr::group_by_at(dplyr::vars(-dplyr::one_of("indices"))) %>%
+      dplyr::group_by(dplyr::across(-dplyr::all_of("indices"))) %>%
       tidyr::nest() %>%
       dplyr::mutate(indices = purrr::map(data, "indices"))
 
@@ -267,8 +265,10 @@ fuzzy_join <- function(x, y, by = NULL, match_fun = NULL,
 
   # in cases where columns share a name, rename each to .x and .y
   n <- intersect(colnames(x), colnames(y))
-  x <- dplyr::rename_at(x, .vars = n, ~ paste0(.x, ".x"))
-  y <- dplyr::rename_at(y, .vars = n, ~ paste0(.x, ".y"))
+  if (length(n) > 0) {
+    x <- dplyr::rename_with(x, ~ paste0(.x, ".x"), .cols = dplyr::all_of(n))
+    y <- dplyr::rename_with(y, ~ paste0(.x, ".y"), .cols = dplyr::all_of(n))
+  }
 
   # fill in indices of the x, y, or both
   # curious if there's a higher performance approach

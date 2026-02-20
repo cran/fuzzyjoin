@@ -12,7 +12,7 @@
 
 <meta name="author" content="David Robinson" />
 
-<meta name="date" content="2025-07-10" />
+<meta name="date" content="2026-02-19" />
 
 <title>Example of stringdist_inner_join: Correcting misspellings against a dictionary</title>
 
@@ -50,9 +50,8 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
-html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -63,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -343,7 +342,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <code>stringdist_inner_join</code>: Correcting misspellings against a
 dictionary</h1>
 <h4 class="author">David Robinson</h4>
-<h4 class="date">2025-07-10</h4>
+<h4 class="date">2026-02-19</h4>
 
 
 
@@ -353,11 +352,12 @@ or a domain-specific category system. But you want to allow for small
 differences in spelling or punctuation.</p>
 <p>The fuzzyjoin package comes with a set of common misspellings (<a href="https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines">from
 Wikipedia</a>):</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(fuzzyjoin)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">data</span>(misspellings)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>misspellings</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 4.2.3</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(fuzzyjoin)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">data</span>(misspellings)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>misspellings</span></code></pre></div>
 <pre><code>## # A tibble: 4,505 × 2
 ##    misspelling correct   
 ##    &lt;chr&gt;       &lt;chr&gt;     
@@ -372,15 +372,12 @@ Wikipedia</a>):</p>
 ##  9 aboutit     about it  
 ## 10 aboutthe    about the 
 ## # ℹ 4,495 more rows</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># use the dictionary of words from the qdapDictionaries package,</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># which is based on the Nettalk corpus.</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">library</span>(qdapDictionaries)</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">tbl_df</span>(DICTIONARY)</span></code></pre></div>
-<pre><code>## Warning: `tbl_df()` was deprecated in dplyr 1.0.0.
-## ℹ Please use `tibble::as_tibble()` instead.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>words</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># use the dictionary of words from the qdapDictionaries package,</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># which is based on the Nettalk corpus.</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">library</span>(qdapDictionaries)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>words <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">as_tibble</span>(DICTIONARY)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>words</span></code></pre></div>
 <pre><code>## # A tibble: 20,137 × 2
 ##    word  syllables
 ##    &lt;chr&gt;     &lt;dbl&gt;
